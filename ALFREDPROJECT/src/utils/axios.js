@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api'
+  baseURL: 'http://localhost:5000/api',
+  withCredentials: true, // This will ensure that cookies are sent with every request
 });
 
 api.interceptors.request.use(
@@ -30,7 +31,7 @@ api.interceptors.response.use(
       url: error.config?.url,
       status: error.response?.status,
       message: error.response?.data?.message,
-      headers: error.config?.headers
+      headers: error.config?.headers,
     });
     return Promise.reject(error);
   }

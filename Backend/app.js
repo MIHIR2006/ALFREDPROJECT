@@ -13,11 +13,32 @@ dotenv.config();
 // Create an Express application
 const app = express();
 
+// Define allowed origins for CORS (including both localhost and production frontend domain)
+const allowedOrigins = [
+  'http://localhost:5174',  // Local development frontend URL
+  'https://alfredproject-6woj-zeta.vercel.app' // Production frontend URL
+];
+
+// CORS options to restrict origins and handle credentials
+const corsOptions = {
+  origin: (origin, callback) => {
+    // Allow requests without an origin (like Postman, curl, etc.)
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Ensure OPTIONS is allowed
+  credentials: true,  // Allow credentials (cookies, headers)
+  allowedHeaders: ['Content-Type', 'Authorization'], // Allow necessary headers
+};
+
 // Middleware to parse JSON bodies
 app.use(express.json());
 
-// Use the cors middleware
-app.use(cors());
+// Use the cors middleware with the custom options
+app.use(cors(corsOptions));
 
 // Import routes
 app.use('/api/auth', authRoutes);
@@ -37,7 +58,7 @@ app.get('/', (req, res) => {
 app.use(errorHandler);
 
 // Start the server
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
